@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Erwin Alegro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #0e1620;
+    --panel: #16212e;
+    --paper: #e9e4d8;
+    --paper-dim: #cfc9bb;
+    --slate: #8695a7;
+    --slate-dim: #56636f;
+    --brass: #cc9f53;
+    --brass-dim: #a9814a;
+    --line: rgba(134,149,167,0.16);
+    --line-strong: rgba(204,159,83,0.35);
+    --error: #c9705f;
+    --display: 'Space Grotesk', sans-serif;
+    --body: 'Source Serif 4', serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:var(--body);
+    min-height:100vh;
+  }
+  a{color:inherit; text-decoration:none;}
+  ::selection{background:var(--brass); color:var(--ink);}
+
+  .blueprint{
+    position:fixed; inset:0; z-index:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px;
+    opacity:0.35;
+    pointer-events:none;
+  }
+
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 6vw;
+    font-family:var(--mono); font-size:13px;
+    background:rgba(14,22,32,0.92);
+    border-bottom:1px solid var(--line);
+  }
+  nav .mark{display:flex; align-items:center; gap:10px; font-family:var(--display); font-weight:600; font-size:16px;}
+  nav .mark .dot{width:8px; height:8px; border-radius:50%; background:var(--brass); box-shadow:0 0 10px var(--brass);}
+  nav .links{display:flex; gap:32px;}
+  nav .links a{color:var(--slate); transition:color .2s;}
+  nav .links a:hover{color:var(--brass);}
+
+  main{
+    position:relative; z-index:1;
+    max-width:760px;
+    margin:0 auto;
+    padding:170px 6vw 120px;
+  }
+
+  .eyebrow{
+    font-family:var(--mono); font-size:13px; color:var(--brass);
+    display:block; margin-bottom:20px;
+  }
+  .eyebrow::before{content:"// "; color:var(--slate-dim);}
+  h1{
+    font-family:var(--display); font-weight:700;
+    font-size:clamp(36px, 5.5vw, 56px);
+    line-height:1.05; letter-spacing:-0.01em;
+    margin-bottom:20px;
+  }
+  h1 .brass{color:var(--brass);}
+  .intro{
+    font-size:17px; line-height:1.8; color:var(--paper-dim);
+    max-width:560px; margin-bottom:64px;
+  }
+
+  form{display:flex; flex-direction:column; gap:26px;}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:26px;}
+  .field{display:flex; flex-direction:column; gap:10px;}
+  label{
+    font-family:var(--mono); font-size:12px; color:var(--slate);
+    text-transform:uppercase; letter-spacing:0.05em;
+  }
+  label .req{color:var(--brass);}
+  input, textarea{
+    background:var(--panel);
+    border:1px solid var(--line);
+    color:var(--paper);
+    font-family:var(--body);
+    font-size:15px;
+    padding:14px 16px;
+    border-radius:2px;
+    transition:border-color .2s;
+  }
+  input:focus, textarea:focus{
+    outline:none;
+    border-color:var(--brass);
+  }
+  textarea{resize:vertical; min-height:140px; font-family:var(--body);}
+  ::placeholder{color:var(--slate-dim); opacity:0.8;}
+
+  /* honeypot - hidden from real users, catches bots */
+  .hp-field{
+    position:absolute;
+    left:-9999px;
+    width:1px; height:1px;
+    overflow:hidden;
+  }
+
+  .captcha-box{
+    background:var(--panel);
+    border:1px dashed var(--line-strong);
+    padding:18px 20px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    font-family:var(--mono);
+    font-size:14px;
+    color:var(--paper-dim);
+  }
+  .captcha-box input{width:90px; padding:10px 12px; flex-shrink:0;}
+  .captcha-box .q{color:var(--brass);}
+
+  .field-error{
+    font-family:var(--mono); font-size:12px; color:var(--error);
+    display:none;
+  }
+  .field.invalid input, .field.invalid textarea{border-color:var(--error);}
+  .field.invalid .field-error{display:block;}
+
+  .submit-row{
+    display:flex; align-items:center; gap:20px; margin-top:12px; flex-wrap:wrap;
+  }
+  button[type="submit"]{
+    font-family:var(--mono); font-size:13px; letter-spacing:0.02em;
+    background:var(--brass); color:var(--ink); font-weight:500;
+    padding:15px 30px; border:none; border-radius:2px; cursor:pointer;
+    transition:all .25s ease;
+  }
+  button[type="submit"]:hover{background:var(--paper); transform:translateY(-2px);}
+  button[type="submit"]:disabled{opacity:0.5; cursor:not-allowed; transform:none;}
+
+  .status-msg{
+    font-family:var(--mono); font-size:13px;
+    padding:14px 18px; border-left:2px solid var(--brass);
+    background:var(--panel);
+    display:none;
+    line-height:1.7;
+  }
+  .status-msg.show{display:block;}
+  .status-msg.error{border-left-color:var(--error); color:var(--error);}
+
+  .setup-note{
+    margin-top:70px;
+    padding-top:36px;
+    border-top:1px solid var(--line);
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:var(--slate-dim);
+    line-height:1.9;
+  }
+  .setup-note b{color:var(--slate);}
+
+  @media (max-width: 640px){
+    .field-row{grid-template-columns:1fr;}
+    nav .links{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="blueprint"></div>
+
+<nav>
+  <div class="mark"><span class="dot"></span> ealegro.com</div>
+  <div class="links">
+    <a href="index.html#summary">Summary</a>
+    <a href="index.html#skills">Skills</a>
+    <a href="index.html#experience">Experience</a>
+    <a href="index.html#projects">Projects</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
+
+<main>
+  <span class="eyebrow">Get in Touch</span>
+  <h1>Tell me about the <span class="brass">project.</span></h1>
+  <p class="intro">Fill in the details below and it'll land straight in my inbox with a clean, searchable subject line — no back-and-forth needed to figure out what it's about.</p>
+
+  <form id="contact-form" novalidate>
+    <div class="field-row">
+      <div class="field" data-field="fullName">
+        <label>Full Name <span class="req">*</span></label>
+        <input type="text" name="fullName" placeholder="Juan Dela Cruz" required>
+        <span class="field-error">Please enter your full name.</span>
+      </div>
+      <div class="field" data-field="subject">
+        <label>Subject <span class="req">*</span></label>
+        <input type="text" name="subject" placeholder="e.g. Angular dashboard project" required>
+        <span class="field-error">Please add a short subject.</span>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field" data-field="company">
+        <label>Company Name</label>
+        <input type="text" name="company" placeholder="Optional">
+      </div>
+      <div class="field" data-field="email">
+        <label>Contact Email <span class="req">*</span></label>
+        <input type="email" name="email" placeholder="you@company.com" required>
+        <span class="field-error">Please enter a valid email address.</span>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field" data-field="mobile">
+        <label>Mobile Number</label>
+        <input type="tel" name="mobile" placeholder="Optional">
+      </div>
+      <div class="field"></div>
+    </div>
+
+    <div class="field" data-field="message">
+      <label>Inquiry / Comments <span class="req">*</span></label>
+      <textarea name="message" placeholder="What are you looking to build?" required></textarea>
+      <span class="field-error">Please add a short message.</span>
+    </div>
+
+    <!-- Honeypot: invisible to real visitors, bots tend to fill every field -->
+    <div class="hp-field" aria-hidden="true">
+      <label for="website">Leave this field empty</label>
+      <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+    </div>
+
+    <div class="field" data-field="captcha">
+      <label>Security Check <span class="req">*</span></label>
+      <div class="captcha-box">
+        <span>What is <span class="q" id="captcha-q"></span> ?</span>
+        <input type="text" name="captchaAnswer" inputmode="numeric" placeholder="Answer" required>
+      </div>
+      <span class="field-error">That answer doesn't look right.</span>
+    </div>
+
+    <div class="submit-row">
+      <button type="submit">Send Inquiry →</button>
+      <span class="status-msg" id="status-msg"></span>
+    </div>
+  </form>
+
+  <div class="setup-note">
+    <b>Note for the WordPress build:</b> this page validates and formats the message client-side, then hands off to your mail flow. On WordPress, wire the same fields into <b>Contact Form 7</b> (free) or <b>WPForms</b>, point the "send to" address at your Gmail, and set the subject template to:<br>
+    <b>[EAlegro.com] Contact Form - {Full Name} {Subject} Website Inquiry</b><br>
+    For real bot protection swap the math check below for <b>Google reCAPTCHA v3</b> (needs a free site key from google.com/recaptcha — I can wire that in once you have it). The honeypot field above works invisibly in both setups and needs no key.
+  </div>
+</main>
+
+<script>
+  // Simple arithmetic challenge as a placeholder for reCAPTCHA (no API key required)
+  let captchaAnswer;
+  function newCaptcha(){
+    const a = Math.floor(Math.random()*8)+2;
+    const b = Math.floor(Math.random()*8)+2;
+    captchaAnswer = a + b;
+    document.getElementById('captcha-q').textContent = `${a} + ${b}`;
+  }
+  newCaptcha();
+
+  const form = document.getElementById('contact-form');
+  const statusMsg = document.getElementById('status-msg');
+
+  function setError(fieldName, invalid){
+    const wrap = form.querySelector(`[data-field="${fieldName}"]`);
+    if(wrap) wrap.classList.toggle('invalid', invalid);
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    statusMsg.classList.remove('show','error');
+
+    const data = Object.fromEntries(new FormData(form).entries());
+    let valid = true;
+
+    // Honeypot check — if filled, silently treat as spam
+    if(data.website){
+      statusMsg.textContent = 'Thanks — your message has been sent.'; // fail silently, no hint to bots
+      statusMsg.classList.add('show');
+      form.reset();
+      newCaptcha();
+      return;
+    }
+
+    setError('fullName', !data.fullName?.trim());
+    if(!data.fullName?.trim()) valid = false;
+
+    setError('subject', !data.subject?.trim());
+    if(!data.subject?.trim()) valid = false;
+
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email || '');
+    setError('email', !emailOk);
+    if(!emailOk) valid = false;
+
+    setError('message', !data.message?.trim());
+    if(!data.message?.trim()) valid = false;
+
+    const captchaOk = parseInt(data.captchaAnswer, 10) === captchaAnswer;
+    setError('captcha', !captchaOk);
+    if(!captchaOk) valid = false;
+
+    if(!valid){
+      statusMsg.textContent = 'Please fix the highlighted fields.';
+      statusMsg.classList.add('show','error');
+      return;
+    }
+
+    // Build the exact subject line format requested
+    const emailSubject = `[EAlegro.com] Contact Form - ${data.fullName} ${data.subject} Website Inquiry`;
+    const emailBody =
+`Company: ${data.company || '—'}
+Email: ${data.email}
+Mobile: ${data.mobile || '—'}
+
+Inquiry:
+${data.message}`;
+
+    // Prototype delivery: opens the visitor's own mail client addressed to your Gmail.
+    // On WordPress this hand-off is replaced by Contact Form 7 / WPForms sending
+    // server-side to your inbox — no mail client required on the visitor's end.
+    const mailto = `mailto:erwin.alegro@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+    window.location.href = mailto;
+
+    statusMsg.textContent = 'Opening your email client to send this through — thanks for reaching out.';
+    statusMsg.classList.add('show');
+    form.reset();
+    newCaptcha();
+  });
+</script>
+
+</body>
+</html>
